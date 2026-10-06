@@ -1,0 +1,11 @@
+@RestApiSistemOptimasi_HostAddress = https://localhost:7191
+
+GET {{RestApiSistemOptimasi_HostAddress}}/api/admin/roles
+Accept: application/json
+
+###
+
+GET {{RestApiSistemOptimasi_HostAddress}}/api/admin/dashboard-stats
+Accept: application/json
+
+###

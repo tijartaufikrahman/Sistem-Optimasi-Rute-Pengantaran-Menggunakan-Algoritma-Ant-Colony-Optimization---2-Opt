@@ -1,0 +1,154 @@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#1e293b" />
+    <meta name="csrf-token" content="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
+    <title>@ViewData["Title"] - Sistem Optimasi Distribusi</title>
+
+    <!-- Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+
+    <!-- App CSS -->
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body>
+    @{
+        var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+        var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Pengguna";
+        var userInitial = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        var roleIdClaim = User.FindFirst("RoleId")?.Value ?? "0";
+        var apiBaseUrl = Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5064";
+    }
+
+    @if (currentAction == "Database" || currentAction == "Manifest" || currentAction == "Kantor" || currentAction == "Drs" || currentAction == "DrsDetail" || currentAction == "DrsHistory")
+    {
+        <link rel="stylesheet" href="~/css/database.css" asp-append-version="true" />
+    }
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <h3><i class="fas fa-route"></i> SysOpt</h3>
+                <p>Sistem Optimasi Distribusi</p>
+            </div>
+            <div class="sidebar-nav" id="sidebarNav">
+                <div class="nav-section">MENU</div>
+                <div id="dynamicSidebarMenus">
+                    <!-- Loaded via jQuery AJAX from Backend API -->
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-logout" style="width:100%;cursor:pointer;border:none;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </nav>
+
+        <div class="main-content" id="mainContent">
+            <header class="topbar">
+                <div class="topbar-main">
+                    <div class="topbar-left">
+                        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <span class="topbar-title">@ViewData["Title"]</span>
+                    </div>
+                    <div class="topbar-account">
+                        <div class="account-chip">
+                            <div class="user-avatar">@userInitial</div>
+                            <div class="account-copy">
+                                <div class="user-name">@userName</div>
+                                <div class="user-role">@userRole</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="breadcrumb-bar">
+                    <span class="breadcrumb-item current">@ViewData["Title"] /</span>
+                </div>
+                @RenderBody()
+            </div>
+        </div>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    }
+    else
+    {
+        @RenderBody()
+    }
+
+    <!-- Libraries -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- App JS -->
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+
+    <script>
+        // Global API Configuration
+        window.API_BASE_URL = '@apiBaseUrl';
+
+        $(function () {
+            var roleId = parseInt('@roleIdClaim') || 0;
+            if (roleId > 0 && $('#dynamicSidebarMenus').length) {
+                $.ajax({
+                    url: window.API_BASE_URL + '/api/admin/menu-roles?roleId=' + roleId,
+                    type: 'GET',
+                    contentType: 'application/json',
+                    success: function (menus) {
+                        var html = '';
+                        var curPath = window.location.pathname.toLowerCase();
+                        // Cari URL yang paling cocok (paling panjang yang cocok) agar /admin/drs tidak aktif saat di /admin/drshistory
+                        var bestMatchUrl = '';
+                        for (var j = 0; j < menus.length; j++) {
+                            var u = (menus[j].url || '').toLowerCase();
+                            if (u && (curPath === u || curPath.startsWith(u + '/'))) {
+                                if (u.length > bestMatchUrl.length) {
+                                    bestMatchUrl = u;
+                                }
+                            }
+                        }
+
+                        for (var i = 0; i < menus.length; i++) {
+                            var m = menus[i];
+                            var mUrl = (m.url || '').toLowerCase();
+                            var isActive = (mUrl === bestMatchUrl);
+                            html += '<a class="nav-link ' + (isActive ? 'active' : '') + '" href="' + m.url + '">';
+                            if (m.icon) {
+                                html += '<i class="' + m.icon + '"></i> ';
+                            }
+                            html += m.namaMenu + '</a>';
+                        }
+                        if (menus.length === 0) {
+                            html = '<span style="padding:12px 20px;color:#94a3b8;font-size:.8rem;">Tidak ada menu</span>';
+                        }
+                        $('#dynamicSidebarMenus').html(html);
+                    },
+                    error: function () {
+                        $('#dynamicSidebarMenus').html('<span style="padding:12px 20px;color:#ef4444;font-size:.8rem;">Gagal memuat menu</span>');
+                    }
+                });
+            }
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,548 @@
+@{
+    ViewData["Title"] = "Manifest Kiriman";
+}
+
+<div id="manifestAlertArea"></div>
+
+<!-- Data Card Manifest -->
+<div class="row">
+    <div class="col-12">
+        <div class="db-data-card">
+            <div class="db-card-top">
+                <h3 class="db-card-title"><i class="fas fa-truck-loading" style="color:#ea580c;margin-right:.45rem;"></i> Data Manifest Kiriman</h3>
+                <button class="db-btn-primary" onclick="openModal('modalCreateManifest')"><i class="fas fa-plus"></i> Tambah Manifest</button>
+            </div>
+
+            <!-- Controls: Status Filter, Length, Search -->
+            <div class="db-card-controls">
+                <div class="db-controls-left" style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span>Tampilkan</span>
+                        <select id="manifestLength" class="db-select"></select>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span style="font-weight:600;"><i class="fas fa-filter" style="color:#ea580c;"></i> Filter Status:</span>
+                        <select id="manifestStatusFilter" class="db-select" style="min-width:130px;">
+                            <option value="Semua">Semua Status</option>
+                            <option value="Manifest">Manifest</option>
+                            <option value="On Delivery">On Delivery</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Failed">Failed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="db-controls-right">
+                    <span>Cari:</span>
+                    <input id="manifestSearch" class="db-input-search" type="text" placeholder="No. resi / penerima / alamat..." />
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="db-table-wrap">
+                <table id="tableManifest" class="db-table">
+                    <thead>
+                        <tr>
+                            <th class="db-th-center" style="width:50px;">#</th>
+                            <th class="db-th-sortable">NO. RESI / KIRIMAN</th>
+                            <th class="db-th-sortable">PENERIMA</th>
+                            <th class="db-th-sortable">ALAMAT TUJUAN</th>
+                            <th class="db-th-sortable">KOORDINAT</th>
+                            <th class="db-th-sortable">BERAT</th>
+                            <th class="db-th-sortable">STATUS</th>
+                            <th class="db-th-sortable">TANGGAL</th>
+                            <th class="db-th-right" style="width:110px;">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manifestBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Footer Pagination -->
+            <div class="db-card-footer">
+                <div class="db-info-text" id="manifestInfo">Menampilkan 0 - 0 dari 0 data</div>
+                <div class="db-pagination" id="manifestPaginate"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Create Manifest -->
+<div id="modalCreateManifest" class="modal-overlay">
+    <div class="modal-box" style="max-width:550px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-plus-circle" style="color:#ea580c;margin-right:.45rem;"></i> Tambah Manifest Kiriman</h3>
+            <button class="modal-close" onclick="closeModal('modalCreateManifest')">&times;</button>
+        </div>
+        <form id="formCreateManifest">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nomor Kiriman / Resi <span style="color:#dc2626;">*</span></label>
+                    <input type="text" name="NomorKiriman" id="createNomorKiriman" class="form-control" required placeholder="Contoh: POS-2026-0001" />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Nama Penerima <span style="color:#dc2626;">*</span></label>
+                        <input type="text" name="NamaPenerima" id="createNamaPenerima" class="form-control" required placeholder="Nama lengkap penerima" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Telepon Penerima</label>
+                        <input type="text" name="TeleponPenerima" id="createTeleponPenerima" class="form-control" placeholder="08xxxxxxxxxx" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Alamat Tujuan <span style="color:#dc2626;">*</span></label>
+                    <textarea name="AlamatTujuan" id="createAlamatTujuan" class="form-control" rows="2" required placeholder="Alamat lengkap penerima..."></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Latitude <span style="color:#dc2626;">*</span></label>
+                        <input type="number" step="any" name="Latitude" id="createLatitude" class="form-control" required placeholder="-7.79250000" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Longitude <span style="color:#dc2626;">*</span></label>
+                        <input type="number" step="any" name="Longitude" id="createLongitude" class="form-control" required placeholder="110.36580000" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Berat (Kg)</label>
+                        <input type="number" step="0.01" name="BeratKg" id="createBeratKg" class="form-control" value="1.00" min="0" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Status Kiriman</label>
+                        <select name="StatusKiriman" id="createStatusKiriman" class="form-control">
+                            <option value="Manifest" selected>Manifest</option>
+                            <option value="On Delivery">On Delivery</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Failed">Failed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="db-btn-outline" onclick="closeModal('modalCreateManifest')">Batal</button>
+                <button type="submit" class="db-btn-primary"><i class="fas fa-save"></i> Simpan Manifest</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Edit Manifest -->
+<div id="modalEditManifest" class="modal-overlay">
+    <div class="modal-box" style="max-width:550px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-edit" style="color:#ea580c;margin-right:.45rem;"></i> Edit Manifest Kiriman</h3>
+            <button class="modal-close" onclick="closeModal('modalEditManifest')">&times;</button>
+        </div>
+        <form id="formEditManifest">
+            <input type="hidden" name="Id" id="editManifestId" />
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nomor Kiriman / Resi <span style="color:#dc2626;">*</span></label>
+                    <input type="text" name="NomorKiriman" id="editNomorKiriman" class="form-control" required />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Nama Penerima <span style="color:#dc2626;">*</span></label>
+                        <input type="text" name="NamaPenerima" id="editNamaPenerima" class="form-control" required />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Telepon Penerima</label>
+                        <input type="text" name="TeleponPenerima" id="editTeleponPenerima" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Alamat Tujuan <span style="color:#dc2626;">*</span></label>
+                    <textarea name="AlamatTujuan" id="editAlamatTujuan" class="form-control" rows="2" required></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Latitude <span style="color:#dc2626;">*</span></label>
+                        <input type="number" step="any" name="Latitude" id="editLatitude" class="form-control" required />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Longitude <span style="color:#dc2626;">*</span></label>
+                        <input type="number" step="any" name="Longitude" id="editLongitude" class="form-control" required />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Berat (Kg)</label>
+                        <input type="number" step="0.01" name="BeratKg" id="editBeratKg" class="form-control" min="0" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Status Kiriman</label>
+                        <select name="StatusKiriman" id="editStatusKiriman" class="form-control">
+                            <option value="Manifest">Manifest</option>
+                            <option value="On Delivery">On Delivery</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Failed">Failed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="db-btn-outline" onclick="closeModal('modalEditManifest')">Batal</button>
+                <button type="submit" class="db-btn-primary"><i class="fas fa-save"></i> Perbarui</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Delete Manifest -->
+<div id="modalDeleteManifest" class="modal-overlay">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle" style="color:#dc2626;margin-right:.45rem;"></i> Hapus Manifest</h3>
+            <button class="modal-close" onclick="closeModal('modalDeleteManifest')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Apakah Anda yakin ingin menghapus manifest kiriman <strong id="deleteManifestNo"></strong>?</p>
+            <p style="font-size:.82rem;color:#64748b;">Tindakan ini tidak dapat dibatalkan.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="db-btn-outline" onclick="closeModal('modalDeleteManifest')">Batal</button>
+            <button type="button" class="db-btn-danger" id="btnConfirmDeleteManifest"><i class="fas fa-trash"></i> Hapus</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(function () {
+    var manifestToDeleteId = null;
+    var rawManifestList = [];
+
+    function showAlert(msg, type) {
+        var cls = type === 'success' ? 'db-alert-success' : 'db-alert-danger';
+        var icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        $('#manifestAlertArea').html(
+            '<div class="db-alert ' + cls + '"><i class="fas ' + icon + '"></i> ' + msg + '</div>'
+        );
+        setTimeout(function () {
+            $('#manifestAlertArea .db-alert').fadeOut(300, function () { $(this).remove(); });
+        }, 3500);
+    }
+
+    window.openModal = function (id) {
+        $('#' + id).addClass('active');
+    };
+    window.closeModal = function (id) {
+        $('#' + id).removeClass('active');
+    };
+    $(document).on('click', '.modal-overlay', function (e) {
+        if (e.target === this) $(this).removeClass('active');
+    });
+
+    function esc(str) {
+        if (!str) return '';
+        return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    function DbTable(config) {
+        this.config = config;
+        this.data = [];
+        this.filtered = [];
+        this.page = 1;
+        this.perPage = 10;
+        this.sortCol = -1;
+        this.sortAsc = true;
+        this.search = '';
+        this.statusFilter = 'Semua';
+    }
+    DbTable.prototype = {
+        setData: function (data) {
+            this.data = data;
+            this.applyFilter();
+        },
+        applyFilter: function () {
+            var s = this.search.toLowerCase();
+            var sf = this.statusFilter;
+
+            this.filtered = this.data.filter(function (row) {
+                var matchStatus = (sf === 'Semua') || (row.statusKiriman === sf);
+                if (!matchStatus) return false;
+
+                if (!s) return true;
+                var content = [row.nomorKiriman, row.namaPenerima, row.teleponPenerima, row.alamatTujuan, row.statusKiriman].join(' ').toLowerCase();
+                return content.indexOf(s) > -1;
+            });
+
+            if (this.sortCol > -1) {
+                var col = this.config.sortKeys[this.sortCol];
+                var asc = this.sortAsc;
+                this.filtered.sort(function (a, b) {
+                    var va = (a[col] != null ? a[col] : '').toString().toLowerCase();
+                    var vb = (b[col] != null ? b[col] : '').toString().toLowerCase();
+                    return asc ? va.localeCompare(vb, undefined, { numeric: true }) : vb.localeCompare(va, undefined, { numeric: true });
+                });
+            }
+            this.page = 1;
+            this.render();
+        },
+        goTo: function (p) {
+            var total = Math.ceil(this.filtered.length / this.perPage) || 1;
+            if (p < 1) p = 1;
+            if (p > total) p = total;
+            this.page = p;
+            this.render();
+        },
+        render: function () {
+            var c = this.config;
+            var start = (this.page - 1) * this.perPage;
+            var end = start + this.perPage;
+            var rows = this.filtered.slice(start, end);
+
+            var html = '';
+            if (rows.length === 0) {
+                html = '<tr><td colspan="' + c.colCount + '" style="text-align:center;padding:2rem;color:#94a3b8;">Tidak ada data manifest tersedia</td></tr>';
+            } else {
+                for (var i = 0; i < rows.length; i++) {
+                    html += c.renderRow(rows[i], start + i + 1);
+                }
+            }
+            $(c.tbody).html(html);
+
+            var total = this.filtered.length;
+            var infoText = total === 0
+                ? 'Tidak ada data'
+                : 'Menampilkan ' + (start + 1) + ' - ' + Math.min(end, total) + ' dari ' + total + ' data';
+            $(c.info).text(infoText);
+
+            var $len = $(c.lengthSel);
+            if ($len.children().length === 0) {
+                $len.html('<option value="10">10</option><option value="25">25</option><option value="50">50</option>');
+                $len.val(this.perPage);
+                $len.on('change', function () {
+                    this.perPage = parseInt($(this).val());
+                    this.page = 1;
+                    this.render();
+                }.bind(this));
+            }
+
+            var $search = $(c.searchInput);
+            $search.off('input').on('input', function () {
+                this.search = $(this).val();
+                this.applyFilter();
+            }.bind(this));
+
+            var totalPages = Math.ceil(total / this.perPage) || 1;
+            var pagHtml = '';
+            pagHtml += '<button class="db-page-btn" data-p="1" ' + (this.page === 1 ? 'disabled' : '') + '>Awal</button>';
+            pagHtml += '<button class="db-page-btn" data-p="' + (this.page - 1) + '" ' + (this.page === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+            for (var p = 1; p <= totalPages; p++) {
+                if (totalPages > 7 && p > 3 && p < totalPages - 2 && Math.abs(p - this.page) > 1) {
+                    if (p === 4 || p === totalPages - 3) pagHtml += '<span style="padding:0 4px;color:#94a3b8;">...</span>';
+                    continue;
+                }
+                pagHtml += '<button class="db-page-btn' + (p === this.page ? ' active' : '') + '" data-p="' + p + '">' + p + '</button>';
+            }
+            pagHtml += '<button class="db-page-btn" data-p="' + (this.page + 1) + '" ' + (this.page === totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
+            pagHtml += '<button class="db-page-btn" data-p="' + totalPages + '" ' + (this.page === totalPages ? 'disabled' : '') + '>Akhir</button>';
+            $(c.paginate).html(pagHtml);
+
+            $(c.paginate).off('click', '.db-page-btn').on('click', '.db-page-btn', function () {
+                var p = parseInt($(this).data('p'));
+                if (!isNaN(p)) this.goTo(p);
+            }.bind(this));
+
+            $(c.table).find('thead th.db-th-sortable').off('click').on('click', function () {
+                var idx = $(c.table).find('thead th.db-th-sortable').index(this);
+                if (this.sortCol === idx) {
+                    this.sortAsc = !this.sortAsc;
+                } else {
+                    this.sortCol = idx;
+                    this.sortAsc = true;
+                }
+                this.applyFilter();
+            }.bind(this));
+        }
+    };
+
+    function getBadgeStatus(status) {
+        switch (status) {
+            case 'Manifest':
+                return '<span class="db-badge" style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;"><i class="fas fa-clipboard-list"></i> Manifest</span>';
+            case 'On Delivery':
+            case 'In Transit':
+                return '<span class="db-badge" style="background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;"><i class="fas fa-shipping-fast"></i> On Delivery</span>';
+            case 'Delivered':
+                return '<span class="db-badge" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;"><i class="fas fa-check-circle"></i> Delivered</span>';
+            case 'Failed':
+                return '<span class="db-badge" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;"><i class="fas fa-times-circle"></i> Failed</span>';
+            default:
+                return '<span class="db-badge">' + (status || '-') + '</span>';
+        }
+    }
+
+    var manifestTable = new DbTable({
+        tbody: '#manifestBody',
+        info: '#manifestInfo',
+        lengthSel: '#manifestLength',
+        searchInput: '#manifestSearch',
+        paginate: '#manifestPaginate',
+        table: '#tableManifest',
+        colCount: 9,
+        sortKeys: ['nomorKiriman', 'namaPenerima', 'alamatTujuan', 'latitude', 'beratKg', 'statusKiriman', 'createdAt'],
+        renderRow: function (m, no) {
+            var telp = m.teleponPenerima ? '<div style="font-size:.78rem;color:#64748b;"><i class="fas fa-phone"></i> ' + m.teleponPenerima + '</div>' : '';
+            var coord = '<span style="font-family:monospace;font-size:.75rem;background:#f8fafc;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">' 
+                + m.latitude.toFixed(6) + ', ' + m.longitude.toFixed(6) + '</span>';
+            
+            return '<tr>' +
+                '<td class="db-td-center">' + no + '</td>' +
+                '<td class="db-td-bold" style="color:#ea580c;"><i class="fas fa-barcode"></i> ' + m.nomorKiriman + '</td>' +
+                '<td><div style="font-weight:600;color:#1e293b;">' + m.namaPenerima + '</div>' + telp + '</td>' +
+                '<td style="max-width:240px;font-size:.82rem;" title="' + esc(m.alamatTujuan) + '">' + m.alamatTujuan + '</td>' +
+                '<td>' + coord + '</td>' +
+                '<td>' + m.beratKg + ' Kg</td>' +
+                '<td>' + getBadgeStatus(m.statusKiriman) + '</td>' +
+                '<td style="font-size:.8rem;color:#64748b;">' + m.createdAt + '</td>' +
+                '<td class="db-td-right">' +
+                    '<div class="db-action-btns" style="justify-content:flex-end;">' +
+                        '<button class="db-btn-icon edit-manifest" data-id="' + m.id + '" title="Edit"><i class="fas fa-pencil-alt"></i></button>' +
+                        '<button class="db-btn-icon danger delete-manifest" data-id="' + m.id + '" data-no="' + esc(m.nomorKiriman) + '" title="Hapus"><i class="fas fa-trash"></i></button>' +
+                    '</div>' +
+                '</td>' +
+            '</tr>';
+        }
+    });
+
+    // Handle Status Filter Change
+    $('#manifestStatusFilter').on('change', function () {
+        manifestTable.statusFilter = $(this).val();
+        manifestTable.applyFilter();
+    });
+
+    function loadManifests() {
+        $.ajax({
+            url: window.API_BASE_URL + '/api/manifests',
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (data) {
+                rawManifestList = data;
+                manifestTable.setData(data);
+            },
+            error: function () {
+                showAlert('Gagal memuat data manifest dari backend.', 'danger');
+            }
+        });
+    }
+
+    // Submit Create Manifest
+    $('#formCreateManifest').on('submit', function (e) {
+        e.preventDefault();
+        var payload = {
+            nomorKiriman: $('#createNomorKiriman').val().trim(),
+            namaPenerima: $('#createNamaPenerima').val().trim(),
+            teleponPenerima: $('#createTeleponPenerima').val().trim() || null,
+            alamatTujuan: $('#createAlamatTujuan').val().trim(),
+            latitude: parseFloat($('#createLatitude').val()) || 0,
+            longitude: parseFloat($('#createLongitude').val()) || 0,
+            beratKg: parseFloat($('#createBeratKg').val()) || 0,
+            statusKiriman: $('#createStatusKiriman').val()
+        };
+
+        $.ajax({
+            url: window.API_BASE_URL + '/api/manifests',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function (res) {
+                closeModal('modalCreateManifest');
+                $('#formCreateManifest')[0].reset();
+                $('#createBeratKg').val('1.00');
+                showAlert('Manifest berhasil ditambahkan.', 'success');
+                loadManifests();
+            },
+            error: function (xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Gagal menambahkan manifest.';
+                showAlert(msg || 'Gagal menambahkan manifest.', 'danger');
+            }
+        });
+    });
+
+    // Open Edit Modal
+    $(document).on('click', '.edit-manifest', function () {
+        var id = $(this).data('id');
+        var item = rawManifestList.find(function (x) { return x.id === id; });
+        if (!item) return;
+
+        $('#editManifestId').val(item.id);
+        $('#editNomorKiriman').val(item.nomorKiriman);
+        $('#editNamaPenerima').val(item.namaPenerima);
+        $('#editTeleponPenerima').val(item.teleponPenerima || '');
+        $('#editAlamatTujuan').val(item.alamatTujuan);
+        $('#editLatitude').val(item.latitude);
+        $('#editLongitude').val(item.longitude);
+        $('#editBeratKg').val(item.beratKg);
+        $('#editStatusKiriman').val(item.statusKiriman);
+
+        openModal('modalEditManifest');
+    });
+
+    // Submit Edit Manifest
+    $('#formEditManifest').on('submit', function (e) {
+        e.preventDefault();
+        var id = $('#editManifestId').val();
+        var payload = {
+            id: parseInt(id),
+            nomorKiriman: $('#editNomorKiriman').val().trim(),
+            namaPenerima: $('#editNamaPenerima').val().trim(),
+            teleponPenerima: $('#editTeleponPenerima').val().trim() || null,
+            alamatTujuan: $('#editAlamatTujuan').val().trim(),
+            latitude: parseFloat($('#editLatitude').val()) || 0,
+            longitude: parseFloat($('#editLongitude').val()) || 0,
+            beratKg: parseFloat($('#editBeratKg').val()) || 0,
+            statusKiriman: $('#editStatusKiriman').val()
+        };
+
+        $.ajax({
+            url: window.API_BASE_URL + '/api/manifests/' + id,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function (res) {
+                closeModal('modalEditManifest');
+                showAlert('Manifest berhasil diperbarui.', 'success');
+                loadManifests();
+            },
+            error: function (xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Gagal memperbarui manifest.';
+                showAlert(msg || 'Gagal memperbarui manifest.', 'danger');
+            }
+        });
+    });
+
+    // Open Delete Modal
+    $(document).on('click', '.delete-manifest', function () {
+        manifestToDeleteId = $(this).data('id');
+        $('#deleteManifestNo').text($(this).data('no'));
+        openModal('modalDeleteManifest');
+    });
+
+    // Confirm Delete Manifest
+    $('#btnConfirmDeleteManifest').on('click', function () {
+        if (!manifestToDeleteId) return;
+
+        $.ajax({
+            url: window.API_BASE_URL + '/api/manifests/' + manifestToDeleteId,
+            type: 'DELETE',
+            success: function () {
+                closeModal('modalDeleteManifest');
+                showAlert('Manifest berhasil dihapus.', 'success');
+                loadManifests();
+            },
+            error: function (xhr) {
+                closeModal('modalDeleteManifest');
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Gagal menghapus manifest.';
+                showAlert(msg || 'Gagal menghapus manifest.', 'danger');
+            }
+        });
+    });
+
+    // Initial Load
+    loadManifests();
+});
+</script>
+}

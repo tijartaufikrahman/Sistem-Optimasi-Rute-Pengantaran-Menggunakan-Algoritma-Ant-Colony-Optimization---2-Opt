@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Programing\\Project 6\\RestApiSistemOptimasi\\RestApiSistemOptimasi\\wwwroot\\uploads\\pod\\POD_17_639249622889867554.jpg",
+      "PackagePath": "staticwebassets\\uploads\\pod\\POD_17_639249622889867554.jpg"
+    },
+    {
+      "Id": "C:\\Programing\\Project 6\\RestApiSistemOptimasi\\RestApiSistemOptimasi\\wwwroot\\uploads\\pod\\POD_17_639249643943734002.jpg",
+      "PackagePath": "staticwebassets\\uploads\\pod\\POD_17_639249643943734002.jpg"
+    },
+    {
+      "Id": "C:\\Programing\\Project 6\\RestApiSistemOptimasi\\RestApiSistemOptimasi\\wwwroot\\uploads\\pod\\POD_17_639249644098176808.jpg",
+      "PackagePath": "staticwebassets\\uploads\\pod\\POD_17_639249644098176808.jpg"
+    },
+    {
+      "Id": "C:\\Programing\\Project 6\\RestApiSistemOptimasi\\RestApiSistemOptimasi\\wwwroot\\uploads\\pod\\POD_17_639249657945815448.jpg",
+      "PackagePath": "staticwebassets\\uploads\\pod\\POD_17_639249657945815448.jpg"
+    },
+    {
+      "Id": "C:\\Programing\\Project 6\\RestApiSistemOptimasi\\RestApiSistemOptimasi\\wwwroot\\uploads\\pod\\POD_17_639249732819353767.jpg",
+      "PackagePath": "staticwebassets\\uploads\\pod\\POD_17_639249732819353767.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.RestApiSistemOptimasi.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.RestApiSistemOptimasi.props",
+      "PackagePath": "build\\RestApiSistemOptimasi.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.RestApiSistemOptimasi.props",
+      "PackagePath": "buildMultiTargeting\\RestApiSistemOptimasi.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.RestApiSistemOptimasi.props",
+      "PackagePath": "buildTransitive\\RestApiSistemOptimasi.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

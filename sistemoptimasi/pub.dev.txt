@@ -1,0 +1,91 @@
+- https://pub.dev/packages/provider
+  provider: ^6.1.5+1
+
+- ISI
+  flutter_secure_storage: ^10.0.0
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+- ISI
+  ISI
+
+

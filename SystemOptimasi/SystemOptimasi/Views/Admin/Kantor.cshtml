@@ -1,0 +1,311 @@
+@{
+    ViewData["Title"] = "Kantor / Hub Distribusi";
+}
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<div id="kantorAlertArea"></div>
+
+<div class="row">
+    <!-- Kolom Kiri: Form & Informasi Kantor -->
+    <div class="col-lg-5 col-md-12">
+        <div class="db-data-card" style="height:calc(100% - 1.5rem);">
+            <div class="db-card-top">
+                <h3 class="db-card-title"><i class="fas fa-building" style="color:#ea580c;margin-right:.45rem;"></i> Profil Kantor Utama</h3>
+                <span class="db-badge" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;"><i class="fas fa-check-circle"></i> Single Hub</span>
+            </div>
+
+            <form id="formKantor" style="padding: 1.5rem;">
+                <input type="hidden" id="kantorId" />
+
+                <div class="form-group mb-3">
+                    <label style="font-weight:600;font-size:.85rem;color:#334155;margin-bottom:.35rem;display:block;">
+                        Kode Kantor <span style="color:#dc2626;">*</span>
+                    </label>
+                    <input type="text" id="kodeKantor" class="form-control" required placeholder="KCU-40000" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label style="font-weight:600;font-size:.85rem;color:#334155;margin-bottom:.35rem;display:block;">
+                        Nama Kantor / Gudang <span style="color:#dc2626;">*</span>
+                    </label>
+                    <input type="text" id="namaKantor" class="form-control" required placeholder="Kantor Pos Bandung Asia Afrika" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label style="font-weight:600;font-size:.85rem;color:#334155;margin-bottom:.35rem;display:block;">
+                        Alamat Lengkap <span style="color:#dc2626;">*</span>
+                    </label>
+                    <textarea id="alamatKantor" class="form-control" rows="3" required placeholder="Jl. Asia Afrika No. 49, Bandung"></textarea>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label style="font-weight:600;font-size:.85rem;color:#334155;margin-bottom:.35rem;display:block;">
+                            Latitude <span style="color:#dc2626;">*</span>
+                        </label>
+                        <input type="number" step="any" id="latKantor" class="form-control" required style="font-family:monospace;" />
+                    </div>
+                    <div class="col-6">
+                        <label style="font-weight:600;font-size:.85rem;color:#334155;margin-bottom:.35rem;display:block;">
+                            Longitude <span style="color:#dc2626;">*</span>
+                        </label>
+                        <input type="number" step="any" id="lngKantor" class="form-control" required style="font-family:monospace;" />
+                    </div>
+                </div>
+
+                <div style="background:#f8fafc;padding:12px;border-radius:6px;border:1px solid #e2e8f0;margin-bottom:1.25rem;">
+                    <div style="font-size:.8rem;color:#64748b;">
+                        <i class="fas fa-info-circle" style="color:#0284c7;margin-right:4px;"></i>
+                        <strong>Petunjuk:</strong> Anda dapat menggeser pin marker atau <strong>mengklik langsung di peta</strong> untuk mengubah posisi koordinat kantor. Gunakan kotak pencarian di atas peta untuk mencari lokasi kota/jalan.
+                    </div>
+                    <div style="margin-top:6px;font-size:.75rem;color:#94a3b8;" id="lastUpdatedInfo">
+                        Terakhir diupdate: -
+                    </div>
+                </div>
+
+                <button type="submit" class="db-btn-primary" id="btnSaveKantor" style="width:100%;justify-content:center;padding:10px;">
+                    <i class="fas fa-save"></i> Simpan Perubahan Kantor
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Kolom Kanan: Peta Interaktif & Pencarian Lokasi -->
+    <div class="col-lg-7 col-md-12">
+        <div class="db-data-card">
+            <div class="db-card-top" style="flex-wrap:wrap;gap:10px;">
+                <h3 class="db-card-title"><i class="fas fa-map-marked-alt" style="color:#ea580c;margin-right:.45rem;"></i> Titik Lokasi Peta (Bandung)</h3>
+                
+                <!-- Pencarian Lokasi OpenStreetMap Nominatim -->
+                <div style="display:flex;gap:6px;flex:1;max-width:380px;">
+                    <div class="input-group" style="display:flex;width:100%;">
+                        <input type="text" id="mapSearchInput" class="db-input-search" style="flex:1;border-top-right-radius:0;border-bottom-right-radius:0;" placeholder="Cari tempat / jalan di Bandung..." />
+                        <button type="button" id="btnMapSearch" class="db-btn-primary" style="border-top-left-radius:0;border-bottom-left-radius:0;padding:6px 14px;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Area Hasil Pencarian Geocoding -->
+            <div id="searchResultsDropdown" style="display:none;background:#fff;border-bottom:1px solid #e2e8f0;max-height:180px;overflow-y:auto;padding:6px 12px;font-size:.82rem;">
+            </div>
+
+            <!-- Kontainer Peta Leaflet -->
+            <div id="kantorMap" style="height:520px;width:100%;border-bottom-left-radius:10px;border-bottom-right-radius:10px;"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(function () {
+    var map = null;
+    var kantorMarker = null;
+
+    function showAlert(msg, type) {
+        var cls = type === 'success' ? 'db-alert-success' : 'db-alert-danger';
+        var icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        $('#kantorAlertArea').html(
+            '<div class="db-alert ' + cls + '"><i class="fas ' + icon + '"></i> ' + msg + '</div>'
+        );
+        setTimeout(function () {
+            $('#kantorAlertArea .db-alert').fadeOut(300, function () { $(this).remove(); });
+        }, 3500);
+    }
+
+    // Inisialisasi Peta Leaflet
+    function initMap(lat, lng, nama) {
+        if (!map) {
+            map = L.map('kantorMap').setView([lat, lng], 14);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Custom Icon Kantor (Warna Oranye Pos)
+            var kantorIcon = L.divIcon({
+                className: 'custom-map-pin',
+                html: '<div style="background:#ea580c;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.4);border:2px solid #fff;"><i class="fas fa-building" style="font-size:16px;"></i></div>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+                popupAnchor: [0, -20]
+            });
+
+            // Buat Marker yang Draggable
+            kantorMarker = L.marker([lat, lng], {
+                icon: kantorIcon,
+                draggable: true
+            }).addTo(map);
+
+            kantorMarker.bindPopup('<strong>' + nama + '</strong><br>Pusat Distribusi (Depot)').openPopup();
+
+            // Event saat marker di-drag selesai
+            kantorMarker.on('dragend', function (e) {
+                var pos = e.target.getLatLng();
+                updateCoordInputs(pos.lat, pos.lng);
+            });
+
+            // Event klik langsung di peta untuk memindahkan marker kantor
+            map.on('click', function (e) {
+                var lat = e.latlng.lat;
+                var lng = e.latlng.lng;
+                kantorMarker.setLatLng([lat, lng]);
+                kantorMarker.openPopup();
+                updateCoordInputs(lat, lng);
+            });
+        } else {
+            kantorMarker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 14);
+            kantorMarker.getPopup().setContent('<strong>' + nama + '</strong><br>Pusat Distribusi (Depot)').openPopup();
+        }
+    }
+
+    function updateCoordInputs(lat, lng) {
+        $('#latKantor').val(lat.toFixed(8));
+        $('#lngKantor').val(lng.toFixed(8));
+    }
+
+    // Load Data Kantor dari Backend
+    function loadKantor() {
+        $.ajax({
+            url: window.API_BASE_URL + '/api/kantor',
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (k) {
+                $('#kantorId').val(k.id);
+                $('#kodeKantor').val(k.kodeKantor);
+                $('#namaKantor').val(k.namaKantor);
+                $('#alamatKantor').val(k.alamat);
+                $('#latKantor').val(k.latitude);
+                $('#lngKantor').val(k.longitude);
+
+                var upd = k.updatedAt || k.createdAt || '-';
+                $('#lastUpdatedInfo').text('Terakhir diupdate: ' + upd);
+
+                initMap(parseFloat(k.latitude), parseFloat(k.longitude), k.namaKantor);
+            },
+            error: function () {
+                showAlert('Gagal memuat profil kantor dari server backend.', 'danger');
+            }
+        });
+    }
+
+    // Sinkronisasi saat input manual koordinat diubah
+    $('#latKantor, #lngKantor').on('change', function () {
+        var lat = parseFloat($('#latKantor').val());
+        var lng = parseFloat($('#lngKantor').val());
+        if (!isNaN(lat) && !isNaN(lng) && kantorMarker) {
+            kantorMarker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 14);
+        }
+    });
+
+    // Submit Update Kantor
+    $('#formKantor').on('submit', function (e) {
+        e.preventDefault();
+
+        var payload = {
+            kodeKantor: $('#kodeKantor').val().trim(),
+            namaKantor: $('#namaKantor').val().trim(),
+            alamat: $('#alamatKantor').val().trim(),
+            latitude: parseFloat($('#latKantor').val()) || 0,
+            longitude: parseFloat($('#lngKantor').val()) || 0
+        };
+
+        var $btn = $('#btnSaveKantor');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+
+        $.ajax({
+            url: window.API_BASE_URL + '/api/kantor',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function (res) {
+                $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Simpan Perubahan Kantor');
+                showAlert(res.message || 'Data kantor berhasil disimpan.', 'success');
+                loadKantor();
+            },
+            error: function (xhr) {
+                $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Simpan Perubahan Kantor');
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Gagal memperbarui data kantor.';
+                showAlert(msg || 'Gagal memperbarui kantor.', 'danger');
+            }
+        });
+    });
+
+    // Pencarian Lokasi Peta via OSM Nominatim Geocoder
+    function searchLocation(query) {
+        if (!query) return;
+        var fullQuery = query + ', Bandung';
+        var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(fullQuery) + '&limit=5';
+
+        $('#btnMapSearch').html('<i class="fas fa-spinner fa-spin"></i>');
+
+        $.getJSON(url, function (results) {
+            $('#btnMapSearch').html('<i class="fas fa-search"></i>');
+            var $drop = $('#searchResultsDropdown');
+            $drop.empty();
+
+            if (!results || results.length === 0) {
+                $drop.html('<div style="padding:6px;color:#94a3b8;">Lokasi tidak ditemukan di Bandung.</div>').show();
+                return;
+            }
+
+            for (var i = 0; i < results.length; i++) {
+                var r = results[i];
+                var itemHtml = '<div class="geo-result-item" data-lat="' + r.lat + '" data-lng="' + r.lon + '" data-name="' + (r.display_name || '').replace(/"/g, '&quot;') + '" style="padding:6px 8px;cursor:pointer;border-bottom:1px solid #f1f5f9;">' +
+                    '<i class="fas fa-map-marker-alt" style="color:#ea580c;margin-right:6px;"></i> ' + r.display_name +
+                '</div>';
+                $drop.append(itemHtml);
+            }
+            $drop.show();
+        }).fail(function () {
+            $('#btnMapSearch').html('<i class="fas fa-search"></i>');
+            showAlert('Gagal menghubungi layanan geocoding peta.', 'danger');
+        });
+    }
+
+    $('#btnMapSearch').on('click', function () {
+        searchLocation($('#mapSearchInput').val().trim());
+    });
+
+    $('#mapSearchInput').on('keypress', function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            searchLocation($(this).val().trim());
+        }
+    });
+
+    // Klik hasil pencarian lokasi
+    $(document).on('click', '.geo-result-item', function () {
+        var lat = parseFloat($(this).data('lat'));
+        var lng = parseFloat($(this).data('lng'));
+        var name = $(this).data('name');
+
+        if (kantorMarker && map) {
+            kantorMarker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 16);
+            updateCoordInputs(lat, lng);
+            $('#alamatKantor').val(name);
+        }
+
+        $('#searchResultsDropdown').hide();
+    });
+
+    // Tutup dropdown jika klik di luar
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('#searchResultsDropdown, #btnMapSearch, #mapSearchInput').length) {
+            $('#searchResultsDropdown').hide();
+        }
+    });
+
+    // Inisialisasi Pertama
+    loadKantor();
+});
+</script>
+}

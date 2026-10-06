@@ -1,0 +1,790 @@
+@{
+    ViewData["Title"] = "Database";
+}
+
+<div id="dbAlertArea"></div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="db-data-card">
+            <div class="db-card-top">
+                <h3 class="db-card-title"><i class="fas fa-users" style="color:#ea580c;margin-right:.45rem;"></i> Tabel Users</h3>
+                <button class="db-btn-primary" onclick="openModal('modalCreateUser')"><i class="fas fa-plus"></i> Tambah User</button>
+            </div>
+            <div class="db-card-controls">
+                <div class="db-controls-left">
+                    <span>Tampilkan</span>
+                    <select id="usersLength" class="db-select"></select>
+                </div>
+                <div class="db-controls-right">
+                    <span>Cari:</span>
+                    <input id="usersSearch" class="db-input-search" type="text" placeholder="" />
+                </div>
+            </div>
+            <div class="db-table-wrap">
+                <table id="tableUsers" class="db-table">
+                    <thead>
+                        <tr>
+                            <th class="db-th-center" style="width:60px;">#</th>
+                            <th class="db-th-sortable">NAMA LENGKAP</th>
+                            <th class="db-th-sortable">EMAIL</th>
+                            <th class="db-th-sortable">ROLE</th>
+                            <th class="db-th-sortable">STATUS</th>
+                            <th class="db-th-sortable">DIBUAT</th>
+                            <th class="db-th-right">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
+            </div>
+            <div class="db-card-footer">
+                <div class="db-info-text" id="usersInfo">Menampilkan 0 - 0 dari 0 data</div>
+                <div class="db-pagination" id="usersPaginate"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="db-data-card">
+            <div class="db-card-top">
+                <h3 class="db-card-title"><i class="fas fa-shield-alt" style="color:#ea580c;margin-right:.45rem;"></i> Tabel Roles</h3>
+                <button class="db-btn-primary" onclick="openModal('modalCreateRole')"><i class="fas fa-plus"></i> Tambah Role</button>
+            </div>
+            <div class="db-card-controls">
+                <div class="db-controls-left">
+                    <span>Tampilkan</span>
+                    <select id="rolesLength" class="db-select"></select>
+                </div>
+                <div class="db-controls-right">
+                    <span>Cari:</span>
+                    <input id="rolesSearch" class="db-input-search" type="text" placeholder="" />
+                </div>
+            </div>
+            <div class="db-table-wrap">
+                <table id="tableRoles" class="db-table">
+                    <thead>
+                        <tr>
+                            <th class="db-th-center" style="width:60px;">#</th>
+                            <th class="db-th-sortable">NAMA ROLE</th>
+                            <th class="db-th-sortable">DESKRIPSI</th>
+                            <th class="db-th-right">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolesBody"></tbody>
+                </table>
+            </div>
+            <div class="db-card-footer">
+                <div class="db-info-text" id="rolesInfo">Menampilkan 0 - 0 dari 0 data</div>
+                <div class="db-pagination" id="rolesPaginate"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="db-data-card">
+            <div class="db-card-top">
+                <h3 class="db-card-title"><i class="fas fa-bars" style="color:#ea580c;margin-right:.45rem;"></i> Tabel Menu Roles</h3>
+                <button class="db-btn-primary" onclick="openModal('modalCreateMenuRole')"><i class="fas fa-plus"></i> Tambah Menu</button>
+            </div>
+            <div class="db-card-controls">
+                <div class="db-controls-left">
+                    <span>Tampilkan</span>
+                    <select id="menuRolesLength" class="db-select"></select>
+                </div>
+                <div class="db-controls-right">
+                    <span>Cari:</span>
+                    <input id="menuRolesSearch" class="db-input-search" type="text" placeholder="" />
+                </div>
+            </div>
+            <div class="db-table-wrap">
+                <table id="tableMenuRoles" class="db-table">
+                    <thead>
+                        <tr>
+                            <th class="db-th-center" style="width:60px;">#</th>
+                            <th class="db-th-sortable">ROLE</th>
+                            <th class="db-th-sortable">NAMA MENU</th>
+                            <th class="db-th-sortable">ICON</th>
+                            <th class="db-th-sortable">URL</th>
+                            <th class="db-th-sortable">URUTAN</th>
+                            <th class="db-th-right">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menuRolesBody"></tbody>
+                </table>
+            </div>
+            <div class="db-card-footer">
+                <div class="db-info-text" id="menuRolesInfo">Menampilkan 0 - 0 dari 0 data</div>
+                <div class="db-pagination" id="menuRolesPaginate"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Create User -->
+<div id="modalCreateUser" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-plus" style="color:#ea580c;margin-right:.45rem;"></i> Tambah User</h3>
+            <button class="modal-close" onclick="closeModal('modalCreateUser')">&times;</button>
+        </div>
+        <form id="formCreateUser">
+            <div class="modal-body">
+                <div class="form-group"><label>Nama Lengkap</label><input type="text" name="NamaLengkap" class="form-control" required /></div>
+                <div class="form-group"><label>Email</label><input type="email" name="Email" class="form-control" required /></div>
+                <div class="form-group"><label>Password</label><input type="password" name="Password" class="form-control" minlength="6" required /></div>
+                <div class="form-group"><label>Konfirmasi Password</label><input type="password" name="ConfirmPassword" class="form-control" minlength="6" required /></div>
+                <div class="form-group"><label>Role</label><select name="RoleId" id="createUserRole" class="form-control" required><option value="">-- Pilih Role --</option></select></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="db-btn-outline" onclick="closeModal('modalCreateUser')">Batal</button>
+                <button type="submit" class="db-btn-primary"><i class="fas fa-save"></i> Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Edit User -->
+<div id="modalEditUser" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-edit" style="color:#ea580c;margin-right:.45rem;"></i> Edit User</h3>
+            <button class="modal-close" onclick="closeModal('modalEditUser')">&times;</button>
+        </div>
+        <form id="formEditUser">
+            <input type="hidden" name="Id" id="editUserId" />
+            <div class="modal-body">
+                <div class="form-group"><label>Nama Lengkap</label><input type="text" name="NamaLengkap" id="editUserName" class="form-control" required /></div>
+                <div class="form-group"><label>Email</label><input type="email" name="Email" id="editUserEmail" class="form-control" required /></div>
+                <div class="form-group"><label>Password Baru (kosongkan jika tidak diubah)</label><input type="password" name="Password" class="form-control" minlength="6" /></div>
+                <div class="form-group"><label>Role</label><select name="RoleId" id="editUserRole" class="form-control" required><option value="">-- Pilih Role --</option></select></div>
+                <div class="form-group"><label>Status</label><select name="IsActive" id="editUserActive" class="form-control"><option value="true">Aktif</option><option value="false">Nonaktif</option></select></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="db-btn-outline" onclick="closeModal('modalEditUser')">Batal</button>
+                <button type="submit" class="db-btn-primary"><i class="fas fa-save"></i> Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Create Role -->
+<div id="modalCreateRole" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-shield-alt" style="color:#ea580c;margin-right:.45rem;"></i> Tambah Role</h3>
+            <button class="modal-close" onclick="closeModal('modalCreateRole')">&times;</button>
+        </div>
+        <form id="formCreateRole">
+            <div class="modal-body">
+                <div class="form-group"><label>Nama Role</label><input type="text" name="NamaRole" class="form-control" required /></div>
+                <div class="form-group"><label>Deskripsi</label><input type="text" name="Deskripsi" class="form-control" /></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="db-btn-outline" onclick="closeModal('modalCreateRole')">Batal</button>
+                <button type="submit" class="db-btn-primary"><i class="fas fa-save"></i> Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Edit Role -->
+<div id="modalEditRole" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-shield-alt" style="color:#ea580c;margin-right:.45rem;"></i> Edit Role</h3>
+            <button class="modal-close" onclick="closeModal('modalEditRole')">&times;</button>
+        </div>
+        <form id="formEditRole">
+            <input type="hidden" name="Id" id="editRoleId" />
+            <div class="modal-body">
+                <div class="form-group"><label>Nama Role</label><input type="text" name="NamaRole" id="editRoleName" class="form-control" required /></div>
+                <div class="form-group"><label>Deskripsi</label><input type="text" name="Deskripsi" id="editRoleDesc" class="form-control" /></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="db-btn-outline" onclick="closeModal('modalEditRole')">Batal</button>
+                <button type="submit" class="db-btn-primary"><i class="fas fa-save"></i> Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Create Menu Role -->
+<div id="modalCreateMenuRole" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-plus-circle" style="color:#ea580c;margin-right:.45rem;"></i> Tambah Menu Role</h3>
+            <button class="modal-close" onclick="closeModal('modalCreateMenuRole')">&times;</button>
+        </div>
+        <form id="formCreateMenuRole">
+            <div class="modal-body">
+                <div class="form-group"><label>Role</label><select name="RoleId" id="createMenuRoleRoleId" class="form-control" required><option value="">-- Pilih Role --</option></select></div>
+                <div class="form-group"><label>Nama Menu</label><input type="text" name="NamaMenu" class="form-control" required /></div>
+                <div class="form-group">
+                    <label>Icon</label>
+                    <input type="hidden" name="Icon" id="createMenuRoleIcon" value="fas fa-home" />
+                    <div class="icon-picker-trigger" onclick="openIconPicker('createMenuRoleIcon')">
+                        <i class="fas fa-home" id="createMenuRoleIconPreview"></i>
+                        <span>fas fa-home</span>
+                    </div>
+                </div>
+                <div class="form-group"><label>URL</label><input type="text" name="Url" class="form-control" required placeholder="/Admin/Dashboard" /></div>
+                <div class="form-group"><label>Urutan</label><input type="number" name="Urutan" class="form-control" value="0" /></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="db-btn-outline" onclick="closeModal('modalCreateMenuRole')">Batal</button>
+                <button type="submit" class="db-btn-primary"><i class="fas fa-save"></i> Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Edit Menu Role -->
+<div id="modalEditMenuRole" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="fas fa-edit" style="color:#ea580c;margin-right:.45rem;"></i> Edit Menu Role</h3>
+            <button class="modal-close" onclick="closeModal('modalEditMenuRole')">&times;</button>
+        </div>
+        <form id="formEditMenuRole">
+            <input type="hidden" name="Id" id="editMenuRoleId" />
+            <div class="modal-body">
+                <div class="form-group"><label>Role</label><select name="RoleId" id="editMenuRoleRoleId" class="form-control" required><option value="">-- Pilih Role --</option></select></div>
+                <div class="form-group"><label>Nama Menu</label><input type="text" name="NamaMenu" id="editMenuRoleName" class="form-control" required /></div>
+                <div class="form-group">
+                    <label>Icon</label>
+                    <input type="hidden" name="Icon" id="editMenuRoleIcon" value="" />
+                    <div class="icon-picker-trigger" onclick="openIconPicker('editMenuRoleIcon')">
+                        <i class="fas fa-home" id="editMenuRoleIconPreview"></i>
+                        <span id="editMenuRoleIconText">-</span>
+                    </div>
+                </div>
+                <div class="form-group"><label>URL</label><input type="text" name="Url" id="editMenuRoleUrl" class="form-control" required /></div>
+                <div class="form-group"><label>Urutan</label><input type="number" name="Urutan" id="editMenuRoleUrutan" class="form-control" /></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="db-btn-outline" onclick="closeModal('modalEditMenuRole')">Batal</button>
+                <button type="submit" class="db-btn-primary"><i class="fas fa-save"></i> Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Confirm Delete -->
+<div id="modalConfirmDelete" class="modal-overlay">
+    <div class="modal-box modal-small">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle" style="color:#dc2626;margin-right:.45rem;"></i> Konfirmasi Hapus</h3>
+            <button class="modal-close" onclick="closeModal('modalConfirmDelete')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Apakah Anda yakin ingin menghapus <strong id="deleteItemName"></strong>?</p>
+            <p style="color:#64748b;font-size:.8rem;">Tindakan ini tidak dapat dibatalkan.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="db-btn-outline" onclick="closeModal('modalConfirmDelete')">Batal</button>
+            <button type="button" id="btnConfirmDelete" class="db-btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+        </div>
+    </div>
+</div>
+
+<!-- Icon Picker Modal -->
+<div id="iconPickerModal" class="modal-overlay" style="z-index:2500;">
+    <div class="modal-box" style="max-width:480px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-icons" style="color:#ea580c;margin-right:.45rem;"></i> Pilih Icon</h3>
+            <button class="modal-close" onclick="closeIconPicker()">&times;</button>
+        </div>
+        <div class="modal-body" style="padding:1rem;">
+            <input type="text" id="iconPickerSearch" class="db-input-search" style="width:100%;margin-bottom:.75rem;" placeholder="Cari icon..." />
+            <div id="iconPickerGrid" class="icon-picker-grid"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(function () {
+
+    var allRoles = [];
+
+    function esc(str) {
+        if (!str) return '';
+        return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    function DbTable(config) {
+        this.config = config;
+        this.data = [];
+        this.filtered = [];
+        this.page = 1;
+        this.perPage = 10;
+        this.sortCol = -1;
+        this.sortAsc = true;
+        this.search = '';
+    }
+    DbTable.prototype = {
+        setData: function (data) {
+            this.data = data;
+            this.applyFilter();
+        },
+        applyFilter: function () {
+            var s = this.search.toLowerCase();
+            this.filtered = s ? this.data.filter(function (row) {
+                return Object.values(row).join(' ').toLowerCase().indexOf(s) > -1;
+            }) : this.data.slice();
+            if (this.sortCol > -1) {
+                var col = this.config.sortKeys[this.sortCol];
+                var asc = this.sortAsc;
+                this.filtered.sort(function (a, b) {
+                    var va = (a[col] || '').toString().toLowerCase();
+                    var vb = (b[col] || '').toString().toLowerCase();
+                    return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+                });
+            }
+            this.page = 1;
+            this.render();
+        },
+        goTo: function (p) {
+            var total = Math.ceil(this.filtered.length / this.perPage);
+            if (p < 1) p = 1;
+            if (p > total) p = total;
+            this.page = p;
+            this.render();
+        },
+        render: function () {
+            var c = this.config;
+            var start = (this.page - 1) * this.perPage;
+            var end = start + this.perPage;
+            var rows = this.filtered.slice(start, end);
+
+            var html = '';
+            if (rows.length === 0) {
+                html = '<tr><td colspan="' + c.colCount + '" style="text-align:center;padding:2rem;color:#94a3b8;">Tidak ada data tersedia</td></tr>';
+            } else {
+                for (var i = 0; i < rows.length; i++) {
+                    html += c.renderRow(rows[i], start + i + 1);
+                }
+            }
+            $(c.tbody).html(html);
+
+            var total = this.filtered.length;
+            var infoText = total === 0
+                ? 'Tidak ada data'
+                : 'Menampilkan ' + (start + 1) + ' - ' + Math.min(end, total) + ' dari ' + total + ' data';
+            $(c.info).text(infoText);
+
+            var $len = $(c.lengthSel);
+            if ($len.children().length === 0) {
+                $len.html('<option value="10">10</option><option value="25">25</option><option value="50">50</option>');
+                $len.val(this.perPage);
+                $len.on('change', function () {
+                    this.perPage = parseInt($(this).val());
+                    this.page = 1;
+                    this.render();
+                }.bind(this));
+            }
+
+            var $search = $(c.searchInput);
+            $search.off('input').on('input', function () {
+                this.search = $(this).val();
+                this.applyFilter();
+            }.bind(this));
+
+            var totalPages = Math.ceil(total / this.perPage) || 1;
+            var pagHtml = '';
+            pagHtml += '<button class="db-page-btn" data-p="1" ' + (this.page === 1 ? 'disabled' : '') + '>Awal</button>';
+            pagHtml += '<button class="db-page-btn" data-p="' + (this.page - 1) + '" ' + (this.page === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+            for (var p = 1; p <= totalPages; p++) {
+                if (totalPages > 7 && p > 3 && p < totalPages - 2 && Math.abs(p - this.page) > 1) {
+                    if (p === 4 || p === totalPages - 3) pagHtml += '<span style="padding:0 4px;color:#94a3b8;">...</span>';
+                    continue;
+                }
+                pagHtml += '<button class="db-page-btn' + (p === this.page ? ' active' : '') + '" data-p="' + p + '">' + p + '</button>';
+            }
+            pagHtml += '<button class="db-page-btn" data-p="' + (this.page + 1) + '" ' + (this.page === totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
+            pagHtml += '<button class="db-page-btn" data-p="' + totalPages + '" ' + (this.page === totalPages ? 'disabled' : '') + '>Akhir</button>';
+            $(c.paginate).html(pagHtml);
+
+            $(c.paginate).off('click', '.db-page-btn').on('click', '.db-page-btn', function () {
+                var p = parseInt($(this).data('p'));
+                if (!isNaN(p)) this.goTo(p);
+            }.bind(this));
+
+            $(c.table).find('thead th.db-th-sortable').off('click').on('click', function () {
+                var idx = $(c.table).find('thead th.db-th-sortable').index(this);
+                if (this.sortCol === idx) {
+                    this.sortAsc = !this.sortAsc;
+                } else {
+                    this.sortCol = idx;
+                    this.sortAsc = true;
+                }
+                this.applyFilter();
+            }.bind(this));
+        }
+    };
+
+    var usersTable = new DbTable({
+        tbody: '#usersBody',
+        info: '#usersInfo',
+        lengthSel: '#usersLength',
+        searchInput: '#usersSearch',
+        paginate: '#usersPaginate',
+        table: '#tableUsers',
+        colCount: 7,
+        sortKeys: ['id', 'namaLengkap', 'email', 'roleName', 'isActive', 'createdAt'],
+        renderRow: function (u, no) {
+            var status = u.isActive
+                ? '<span class="db-badge db-badge-green"><i class="fas fa-check"></i> Aktif</span>'
+                : '<span class="db-badge db-badge-red"><i class="fas fa-times"></i> Nonaktif</span>';
+            return '<tr>' +
+                '<td class="db-td-center">' + no + '</td>' +
+                '<td class="db-td-bold">' + u.namaLengkap + '</td>' +
+                '<td>' + u.email + '</td>' +
+                '<td><span class="db-badge db-badge-green">' + u.roleName + '</span></td>' +
+                '<td>' + status + '</td>' +
+                '<td>' + u.createdAt + '</td>' +
+                '<td><div class="db-action-btns">' +
+                    '<button class="db-btn-icon" onclick="openEditUser(' + u.id + ',\'' + esc(u.namaLengkap) + '\',\'' + esc(u.email) + '\',' + u.roleId + ',' + u.isActive + ')"><i class="fas fa-pen"></i> Edit</button>' +
+                    '<button class="db-btn-icon danger" onclick="confirmDelete(\'/api/admin/users/' + u.id + '\',\'' + esc(u.namaLengkap) + '\', \'DELETE\')"><i class="fas fa-trash"></i> Hapus</button>' +
+                '</div></td></tr>';
+        }
+    });
+
+    var rolesTable = new DbTable({
+        tbody: '#rolesBody',
+        info: '#rolesInfo',
+        lengthSel: '#rolesLength',
+        searchInput: '#rolesSearch',
+        paginate: '#rolesPaginate',
+        table: '#tableRoles',
+        colCount: 4,
+        sortKeys: ['id', 'namaRole', 'deskripsi'],
+        renderRow: function (r, no) {
+            return '<tr>' +
+                '<td class="db-td-center">' + no + '</td>' +
+                '<td class="db-td-bold">' + r.namaRole + '</td>' +
+                '<td>' + r.deskripsi + '</td>' +
+                '<td><div class="db-action-btns">' +
+                    '<button class="db-btn-icon" onclick="openEditRole(' + r.id + ',\'' + esc(r.namaRole) + '\',\'' + esc(r.deskripsi) + '\')"><i class="fas fa-pen"></i> Edit</button>' +
+                    '<button class="db-btn-icon danger" onclick="confirmDelete(\'/api/admin/roles/' + r.id + '\',\'' + esc(r.namaRole) + '\', \'DELETE\')"><i class="fas fa-trash"></i> Hapus</button>' +
+                '</div></td></tr>';
+        }
+    });
+
+    var menuRolesTable = new DbTable({
+        tbody: '#menuRolesBody',
+        info: '#menuRolesInfo',
+        lengthSel: '#menuRolesLength',
+        searchInput: '#menuRolesSearch',
+        paginate: '#menuRolesPaginate',
+        table: '#tableMenuRoles',
+        colCount: 7,
+        sortKeys: ['id', 'roleName', 'namaMenu', 'icon', 'url', 'urutan'],
+        renderRow: function (m, no) {
+            return '<tr>' +
+                '<td class="db-td-center">' + no + '</td>' +
+                '<td>' + m.roleName + '</td>' +
+                '<td class="db-td-bold">' + m.namaMenu + '</td>' +
+                '<td><i class="' + m.icon + '"></i> <span style="color:#94a3b8;font-size:.72rem;">' + m.icon + '</span></td>' +
+                '<td><code style="font-size:.72rem;color:#6366f1;">' + m.url + '</code></td>' +
+                '<td class="db-td-center">' + m.urutan + '</td>' +
+                '<td><div class="db-action-btns">' +
+                    '<button class="db-btn-icon" onclick="openEditMenuRole(' + m.id + ',' + m.roleId + ',\'' + esc(m.namaMenu) + '\',\'' + esc(m.icon) + '\',\'' + esc(m.url) + '\',' + m.urutan + ')"><i class="fas fa-pen"></i> Edit</button>' +
+                    '<button class="db-btn-icon danger" onclick="confirmDelete(\'/api/admin/menu-roles/' + m.id + '\',\'' + esc(m.namaMenu) + '\', \'DELETE\')"><i class="fas fa-trash"></i> Hapus</button>' +
+                '</div></td></tr>';
+        }
+    });
+
+    // Load Data via jQuery AJAX ke Backend REST API
+    function loadAll() {
+        $.ajax({
+            url: window.API_BASE_URL + '/api/admin/users',
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (data) { usersTable.setData(data); }
+        });
+        $.ajax({
+            url: window.API_BASE_URL + '/api/admin/roles',
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (data) {
+                allRoles = data;
+                rolesTable.setData(data);
+                populateSelects();
+            }
+        });
+        $.ajax({
+            url: window.API_BASE_URL + '/api/admin/menu-roles',
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (data) { menuRolesTable.setData(data); }
+        });
+    }
+
+    function populateSelects() {
+        var opts = '<option value="">-- Pilih Role --</option>';
+        for (var i = 0; i < allRoles.length; i++) {
+            opts += '<option value="' + allRoles[i].id + '">' + allRoles[i].namaRole + '</option>';
+        }
+        $('#createUserRole, #editUserRole, #createMenuRoleRoleId, #editMenuRoleRoleId').html(opts);
+    }
+
+    function resetModalForm(id) {
+        var $m = $('#' + id);
+        $m.find('form').each(function () { this.reset(); });
+        $m.find('.form-control').removeClass('is-invalid is-valid');
+    }
+
+    window.openModal = function (id) { $('#' + id).addClass('active'); };
+    window.closeModal = function (id) { resetModalForm(id); $('#' + id).removeClass('active'); };
+    $(document).on('click', '.modal-overlay', function (e) {
+        if (e.target === this) { resetModalForm(this.id); $(this).removeClass('active'); }
+    });
+    $(document).on('keydown', function (e) {
+        if (e.key === 'Escape') {
+            $('.modal-overlay.active').each(function () { resetModalForm(this.id); $(this).removeClass('active'); });
+        }
+    });
+
+    function showAlert(type, message) {
+        var icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+        $('#dbAlertArea').html('<div class="alert alert-' + type + ' db-alert"><i class="fas fa-' + icon + '"></i> ' + message + '</div>');
+        setTimeout(function () { $('#dbAlertArea .db-alert').fadeOut(300, function () { $(this).remove(); }); }, 4000);
+    }
+
+    // Fungsi Standar jQuery AJAX ke Backend REST API
+    function callApi(url, method, data, cb) {
+        $.ajax({
+            url: window.API_BASE_URL + url,
+            type: method,
+            contentType: 'application/json',
+            data: data ? JSON.stringify(data) : null,
+            success: function (res) {
+                if (res.success !== false) {
+                    if (cb) cb();
+                    showAlert('success', res.message || 'Operasi berhasil.');
+                    setTimeout(loadAll, 400);
+                } else {
+                    showAlert('danger', res.message || 'Terjadi kesalahan.');
+                }
+            },
+            error: function (xhr) {
+                var msg = 'Terjadi kesalahan komunikasi dengan server Backend.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                showAlert('danger', msg);
+            }
+        });
+    }
+
+    window.openEditUser = function (id, name, email, roleId, isActive) {
+        $('#editUserId').val(id);
+        $('#editUserName').val(name.replace(/\\'/g, "'"));
+        $('#editUserEmail').val(email.replace(/\\'/g, "'"));
+        $('#editUserRole').val(roleId);
+        $('#editUserActive').val(isActive ? 'true' : 'false');
+        openModal('modalEditUser');
+    };
+    window.openEditRole = function (id, name, desc) {
+        $('#editRoleId').val(id);
+        $('#editRoleName').val(name.replace(/\\'/g, "'"));
+        $('#editRoleDesc').val(desc.replace(/\\'/g, "'"));
+        openModal('modalEditRole');
+    };
+    window.openEditMenuRole = function (id, roleId, name, icon, url, urutan) {
+        $('#editMenuRoleId').val(id);
+        $('#editMenuRoleRoleId').val(roleId);
+        $('#editMenuRoleName').val(name.replace(/\\'/g, "'"));
+        var iconVal = icon.replace(/\\'/g, "'");
+        $('#editMenuRoleIcon').val(iconVal);
+        $('#editMenuRoleIconPreview').attr('class', iconVal || 'fas fa-home');
+        $('#editMenuRoleIconText').text(iconVal || '-');
+        $('#editMenuRoleUrl').val(url.replace(/\\'/g, "'"));
+        $('#editMenuRoleUrutan').val(urutan);
+        openModal('modalEditMenuRole');
+    };
+
+    window.confirmDelete = function (apiEndpoint, name, method) {
+        $('#deleteItemName').text(name.replace(/\\'/g, "'"));
+        $('#btnConfirmDelete').off('click').on('click', function () {
+            callApi(apiEndpoint, method || 'DELETE', null, function () { closeModal('modalConfirmDelete'); });
+        });
+        openModal('modalConfirmDelete');
+    };
+
+    // FORM SUBMISSIONS MENGGUNAKAN $.ajax DENGAN contentType: 'application/json'
+    $('#formCreateUser').on('submit', function (e) {
+        e.preventDefault();
+        var payload = {
+            NamaLengkap: $(this).find('[name="NamaLengkap"]').val(),
+            Email: $(this).find('[name="Email"]').val(),
+            Password: $(this).find('[name="Password"]').val(),
+            ConfirmPassword: $(this).find('[name="ConfirmPassword"]').val(),
+            RoleId: parseInt($(this).find('[name="RoleId"]').val()) || 0
+        };
+        callApi('/api/admin/users', 'POST', payload, function () { closeModal('modalCreateUser'); });
+    });
+
+    $('#formEditUser').on('submit', function (e) {
+        e.preventDefault();
+        var id = parseInt($('#editUserId').val());
+        var payload = {
+            Id: id,
+            NamaLengkap: $('#editUserName').val(),
+            Email: $('#editUserEmail').val(),
+            Password: $(this).find('[name="Password"]').val() || null,
+            RoleId: parseInt($('#editUserRole').val()) || 0,
+            IsActive: $('#editUserActive').val() === 'true'
+        };
+        callApi('/api/admin/users/' + id, 'PUT', payload, function () { closeModal('modalEditUser'); });
+    });
+
+    $('#formCreateRole').on('submit', function (e) {
+        e.preventDefault();
+        var payload = {
+            NamaRole: $(this).find('[name="NamaRole"]').val(),
+            Deskripsi: $(this).find('[name="Deskripsi"]').val()
+        };
+        callApi('/api/admin/roles', 'POST', payload, function () { closeModal('modalCreateRole'); });
+    });
+
+    $('#formEditRole').on('submit', function (e) {
+        e.preventDefault();
+        var id = parseInt($('#editRoleId').val());
+        var payload = {
+            Id: id,
+            NamaRole: $('#editRoleName').val(),
+            Deskripsi: $('#editRoleDesc').val()
+        };
+        callApi('/api/admin/roles/' + id, 'PUT', payload, function () { closeModal('modalEditRole'); });
+    });
+
+    $('#formCreateMenuRole').on('submit', function (e) {
+        e.preventDefault();
+        var payload = {
+            RoleId: parseInt($('#createMenuRoleRoleId').val()) || 0,
+            NamaMenu: $(this).find('[name="NamaMenu"]').val(),
+            Icon: $('#createMenuRoleIcon').val(),
+            Url: $(this).find('[name="Url"]').val(),
+            Urutan: parseInt($(this).find('[name="Urutan"]').val()) || 0
+        };
+        callApi('/api/admin/menu-roles', 'POST', payload, function () { closeModal('modalCreateMenuRole'); });
+    });
+
+    $('#formEditMenuRole').on('submit', function (e) {
+        e.preventDefault();
+        var id = parseInt($('#editMenuRoleId').val());
+        var payload = {
+            Id: id,
+            RoleId: parseInt($('#editMenuRoleRoleId').val()) || 0,
+            NamaMenu: $('#editMenuRoleName').val(),
+            Icon: $('#editMenuRoleIcon').val(),
+            Url: $('#editMenuRoleUrl').val(),
+            Urutan: parseInt($('#editMenuRoleUrutan').val()) || 0
+        };
+        callApi('/api/admin/menu-roles/' + id, 'PUT', payload, function () { closeModal('modalEditMenuRole'); });
+    });
+
+    // ICON PICKER
+    var iconPickerIcons = [
+        'fas fa-home','fas fa-tachometer-alt','fas fa-database','fas fa-users','fas fa-user',
+        'fas fa-user-plus','fas fa-user-edit','fas fa-user-shield','fas fa-users-cog',
+        'fas fa-shield-alt','fas fa-shield-halved','fas fa-lock','fas fa-key','fas fa-cog',
+        'fas fa-gear','fas fa-wrench','fas fa-tools','fas fa-bars','fas fa-bars-staggered',
+        'fas fa-list','fas fa-list-ul','fas fa-table','fas fa-th','fas fa-th-large',
+        'fas fa-calendar','fas fa-calendar-alt','fas fa-calendar-check','fas fa-clock',
+        'fas fa-chart-bar','fas fa-chart-line','fas fa-chart-pie','fas fa-chart-area',
+        'fas fa-bell','fas fa-envelope','fas fa-envelope-open','fas fa-phone',
+        'fas fa-search','fas fa-search-plus','fas fa-filter','fas fa-sort',
+        'fas fa-download','fas fa-upload','fas fa-cloud','fas fa-cloud-upload-alt',
+        'fas fa-file','fas fa-file-alt','fas fa-file-pdf','fas fa-file-word','fas fa-file-powerpoint',
+        'fas fa-file-excel','fas fa-folder','fas fa-folder-open','fas fa-folder-plus',
+        'fas fa-image','fas fa-video','fas fa-music','fas fa-camera',
+        'fas fa-star','fas fa-heart','fas fa-thumbs-up','fas fa-thumbs-down',
+        'fas fa-book','fas fa-book-open','fas fa-graduation-cap','fas fa-palette',
+        'fas fa-paint-brush','fas fa-pencil-alt','fas fa-edit','fas fa-trash',
+        'fas fa-trash-alt','fas fa-plus','fas fa-plus-circle','fas fa-minus',
+        'fas fa-minus-circle','fas fa-check','fas fa-check-circle','fas fa-times',
+        'fas fa-times-circle','fas fa-exclamation','fas fa-exclamation-circle',
+        'fas fa-info-circle','fas fa-question-circle','fas fa-arrow-left','fas fa-arrow-right',
+        'fas fa-arrow-up','fas fa-arrow-down','fas fa-chevron-left','fas fa-chevron-right',
+        'fas fa-chevron-up','fas fa-chevron-down','fas fa-angle-left','fas fa-angle-right',
+        'fas fa-sign-in-alt','fas fa-sign-out-alt','fas fa-power-off','fas fa-sync',
+        'fas fa-redo','fas fa-undo','fas fa-save','fas fa-print',
+        'fas fa-link','fas fa-external-link-alt','fas fa-qrcode','fas fa-code',
+        'fas fa-terminal','fas fa-laptop','fas fa-mobile-alt','fas fa-desktop',
+        'fas fa-server','fas fa-network-wired','fas fa-wifi','fas fa-map-marker-alt',
+        'fas fa-map','fas fa-directions','fas fa-globe','fas fa-globe-americas',
+        'fas fa-moon','fas fa-sun','fas fa-fire','fas fa-bolt',
+        'fas fa-droplet','fas fa-leaf','fas fa-tree','fas fa-seedling',
+        'fas fa-paw','fas fa-fish','fas fa-bug','fas fa-dove',
+        'fas fa-baby','fas fa-child','fas fa-man','fas fa-woman',
+        'fas fa-flag','fas fa-flag-checkered','fas fa-tag','fas fa-tags',
+        'fas fa-bookmark','fas fa-bookmark-alt','fas fa-thumbtack','fas fa-pushpin',
+        'fas fa-bullseye','fas fa-crosshairs','fas fa-ruler','fas fa-ruler-combined',
+        'fas fa-weight','fas fa-balance-scale','fas fa-coins','fas fa-money-bill',
+        'fas fa-credit-card','fas fa-wallet','fas fa-shopping-cart','fas fa-shopping-bag',
+        'fas fa-store','fas fa-industry','fas fa-construction','fas fa-hard-hat'
+    ];
+
+    var iconPickerTarget = null;
+
+    window.openIconPicker = function (inputId) {
+        iconPickerTarget = inputId;
+        var currentVal = $('#' + inputId).val();
+        var $grid = $('#iconPickerGrid');
+        $grid.empty();
+        for (var i = 0; i < iconPickerIcons.length; i++) {
+            var cls = iconPickerIcons[i];
+            var sel = cls === currentVal ? ' selected' : '';
+            $grid.append('<div class="icon-picker-item' + sel + '" data-icon="' + cls + '" title="' + cls + '"><i class="' + cls + '"></i></div>');
+        }
+        $('#iconPickerSearch').val('');
+        filterIconPicker('');
+        $('#iconPickerModal').addClass('active');
+    };
+
+    window.closeIconPicker = function () {
+        $('#iconPickerModal').removeClass('active');
+        iconPickerTarget = null;
+    };
+
+    $(document).on('click', '.icon-picker-item', function () {
+        var cls = $(this).data('icon');
+        if (!iconPickerTarget) return;
+        $('#' + iconPickerTarget).val(cls);
+        var previewId = iconPickerTarget + 'Preview';
+        var textId = iconPickerTarget + 'Text';
+        $('#' + previewId).attr('class', cls);
+        var $text = $('#' + textId);
+        if ($text.length) $text.text(cls);
+        else $('#' + previewId).next('span').text(cls);
+        closeIconPicker();
+    });
+
+    $('#iconPickerSearch').on('input', function () {
+        filterIconPicker($(this).val().toLowerCase());
+    });
+
+    function filterIconPicker(q) {
+        $('#iconPickerGrid .icon-picker-item').each(function () {
+            var icon = $(this).data('icon').toLowerCase();
+            $(this).toggle(icon.indexOf(q) > -1);
+        });
+    }
+
+    $(document).on('click', '#iconPickerModal', function (e) {
+        if (e.target === this) closeIconPicker();
+    });
+
+    loadAll();
+
+});
+</script>
+}
+

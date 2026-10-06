@@ -1,0 +1,264 @@
+@{
+    ViewData["Title"] = "History Delivery Run Sheet";
+}
+
+<div id="drsHistoryAlertArea"></div>
+
+<!-- Data Card History DRS -->
+<div class="row">
+    <div class="col-12">
+        <div class="db-data-card">
+            <div class="db-card-top">
+                <h3 class="db-card-title"><i class="fas fa-history" style="color:#ea580c;margin-right:.45rem;"></i> History Delivery Run Sheet (DRS)</h3>
+            </div>
+
+            <!-- Controls: Length & Search -->
+            <div class="db-card-controls">
+                <div class="db-controls-left" style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span>Tampilkan</span>
+                        <select id="historyLength" class="db-select"></select>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span style="font-weight:600;"><i class="fas fa-calendar-alt" style="color:#ea580c;"></i> Periode:</span>
+                        <input type="date" id="historyTglAwal" class="db-select" style="padding:4px 8px;" />
+                        <span>s/d</span>
+                        <input type="date" id="historyTglAkhir" class="db-select" style="padding:4px 8px;" />
+                        <button type="button" class="db-btn-outline" id="btnFilterHistoryDate" style="padding:4px 10px;font-size:.82rem;"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+                <div class="db-controls-right">
+                    <span>Cari:</span>
+                    <input id="historySearch" class="db-input-search" type="text" placeholder="No. DRS / Oranger..." />
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="db-table-wrap">
+                <table id="tableHistory" class="db-table">
+                    <thead>
+                        <tr>
+                            <th class="db-th-center" style="width:50px;">#</th>
+                            <th class="db-th-sortable">NO. DRS</th>
+                            <th class="db-th-sortable">KANTOR / HUB</th>
+                            <th class="db-th-sortable">ORANGER</th>
+                            <th class="db-th-sortable">TANGGAL TUGAS</th>
+                            <th class="db-th-sortable db-th-center">TOTAL KIRIMAN</th>
+                            <th class="db-th-sortable">STATUS</th>
+                            <th class="db-th-sortable">DIBUAT</th>
+                            <th class="db-th-right" style="width:80px;">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Footer Pagination -->
+            <div class="db-card-footer">
+                <div class="db-info-text" id="historyInfo">Menampilkan 0 - 0 dari 0 data</div>
+                <div class="db-pagination" id="historyPaginate"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(function () {
+    var rawHistoryList = [];
+
+    function DbTable(config) {
+        this.config = config;
+        this.data = [];
+        this.filtered = [];
+        this.page = 1;
+        this.perPage = 10;
+        this.sortCol = -1;
+        this.sortAsc = true;
+        this.search = '';
+    }
+    DbTable.prototype = {
+        setData: function (data) {
+            this.data = data;
+            this.applyFilter();
+        },
+        applyFilter: function () {
+            var s = this.search.toLowerCase();
+
+            this.filtered = this.data.filter(function (row) {
+                if (!s) return true;
+                var content = [row.noDRS, row.namaOranger, row.namaKantor, row.tanggalTugas, row.statusDRS].join(' ').toLowerCase();
+                return content.indexOf(s) > -1;
+            });
+
+            if (this.sortCol > -1) {
+                var col = this.config.sortKeys[this.sortCol];
+                var asc = this.sortAsc;
+                this.filtered.sort(function (a, b) {
+                    var va = (a[col] != null ? a[col] : '').toString().toLowerCase();
+                    var vb = (b[col] != null ? b[col] : '').toString().toLowerCase();
+                    return asc ? va.localeCompare(vb, undefined, { numeric: true }) : vb.localeCompare(va, undefined, { numeric: true });
+                });
+            }
+            this.page = 1;
+            this.render();
+        },
+        goTo: function (p) {
+            var total = Math.ceil(this.filtered.length / this.perPage) || 1;
+            if (p < 1) p = 1;
+            if (p > total) p = total;
+            this.page = p;
+            this.render();
+        },
+        render: function () {
+            var c = this.config;
+            var start = (this.page - 1) * this.perPage;
+            var end = start + this.perPage;
+            var rows = this.filtered.slice(start, end);
+
+            var html = '';
+            if (rows.length === 0) {
+                html = '<tr><td colspan="' + c.colCount + '" style="text-align:center;padding:2rem;color:#94a3b8;">Tidak ada data history DRS tersedia</td></tr>';
+            } else {
+                for (var i = 0; i < rows.length; i++) {
+                    html += c.renderRow(rows[i], start + i + 1);
+                }
+            }
+            $(c.tbody).html(html);
+
+            var total = this.filtered.length;
+            var infoText = total === 0
+                ? 'Tidak ada data'
+                : 'Menampilkan ' + (start + 1) + ' - ' + Math.min(end, total) + ' dari ' + total + ' data';
+            $(c.info).text(infoText);
+
+            var $len = $(c.lengthSel);
+            if ($len.children().length === 0) {
+                $len.html('<option value="10">10</option><option value="25">25</option><option value="50">50</option>');
+                $len.val(this.perPage);
+                $len.on('change', function () {
+                    this.perPage = parseInt($(this).val());
+                    this.page = 1;
+                    this.render();
+                }.bind(this));
+            }
+
+            var $search = $(c.searchInput);
+            $search.off('input').on('input', function () {
+                this.search = $(this).val();
+                this.applyFilter();
+            }.bind(this));
+
+            var totalPages = Math.ceil(total / this.perPage) || 1;
+            var pagHtml = '';
+            pagHtml += '<button class="db-page-btn" data-p="1" ' + (this.page === 1 ? 'disabled' : '') + '>Awal</button>';
+            pagHtml += '<button class="db-page-btn" data-p="' + (this.page - 1) + '" ' + (this.page === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+            for (var p = 1; p <= totalPages; p++) {
+                if (totalPages > 7 && p > 3 && p < totalPages - 2 && Math.abs(p - this.page) > 1) {
+                    if (p === 4 || p === totalPages - 3) pagHtml += '<span style="padding:0 4px;color:#94a3b8;">...</span>';
+                    continue;
+                }
+                pagHtml += '<button class="db-page-btn' + (p === this.page ? ' active' : '') + '" data-p="' + p + '">' + p + '</button>';
+            }
+            pagHtml += '<button class="db-page-btn" data-p="' + (this.page + 1) + '" ' + (this.page === totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
+            pagHtml += '<button class="db-page-btn" data-p="' + totalPages + '" ' + (this.page === totalPages ? 'disabled' : '') + '>Akhir</button>';
+            $(c.paginate).html(pagHtml);
+
+            $(c.paginate).off('click', '.db-page-btn').on('click', '.db-page-btn', function () {
+                var p = parseInt($(this).data('p'));
+                if (!isNaN(p)) this.goTo(p);
+            }.bind(this));
+
+            $(c.table).find('thead th.db-th-sortable').off('click').on('click', function () {
+                var idx = $(c.table).find('thead th.db-th-sortable').index(this);
+                if (this.sortCol === idx) {
+                    this.sortAsc = !this.sortAsc;
+                } else {
+                    this.sortCol = idx;
+                    this.sortAsc = true;
+                }
+                this.applyFilter();
+            }.bind(this));
+        }
+    };
+
+    var historyTable = new DbTable({
+        tbody: '#historyBody',
+        info: '#historyInfo',
+        lengthSel: '#historyLength',
+        searchInput: '#historySearch',
+        paginate: '#historyPaginate',
+        table: '#tableHistory',
+        colCount: 9,
+        sortKeys: ['noDRS', 'namaKantor', 'namaOranger', 'tanggalTugas', 'totalKiriman', 'statusDRS', 'createdAt'],
+        renderRow: function (d, no) {
+            return '<tr>' +
+                '<td class="db-td-center">' + no + '</td>' +
+                '<td class="db-td-bold" style="color:#ea580c;font-family:monospace;">' + d.noDRS + '</td>' +
+                '<td style="color:#1e293b;">' + d.namaKantor + '</td>' +
+                '<td style="font-weight:600;color:#0f172a;">' + d.namaOranger + '</td>' +
+                '<td style="color:#334155;">' + d.tanggalTugas + '</td>' +
+                '<td class="db-td-center" style="font-weight:600;color:#1e293b;">' + (d.totalKiriman || 0) + ' Kiriman</td>' +
+                '<td><span class="db-badge" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;">Completed</span></td>' +
+                '<td style="font-size:.8rem;color:#64748b;">' + d.createdAt + '</td>' +
+                '<td class="db-td-right">' +
+                    '<div class="db-action-btns" style="justify-content:flex-end;">' +
+                        '<button class="db-btn-icon detail-drs" data-id="' + d.id + '" title="Lihat Detail DRS"><i class="fas fa-eye"></i></button>' +
+                    '</div>' +
+                '</td>' +
+            '</tr>';
+        }
+    });
+
+    $(document).on('click', '.detail-drs', function () {
+        var id = $(this).data('id');
+        window.location.href = '/Admin/DrsDetail/' + id;
+    });
+
+    function getWibDateString() {
+        var d = new Date();
+        var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+        var wibDate = new Date(utc + (3600000 * 7));
+        var yyyy = wibDate.getFullYear();
+        var mm = String(wibDate.getMonth() + 1).padStart(2, '0');
+        var dd = String(wibDate.getDate()).padStart(2, '0');
+        return yyyy + '-' + mm + '-' + dd;
+    }
+
+    var defaultToday = getWibDateString();
+    $('#historyTglAwal').val(defaultToday);
+    $('#historyTglAkhir').val(defaultToday);
+
+    function loadHistoryData() {
+        var tglAwal = $('#historyTglAwal').val();
+        var tglAkhir = $('#historyTglAkhir').val();
+        var params = ['status=Completed'];
+        if (tglAwal) params.push('tglAwal=' + encodeURIComponent(tglAwal));
+        if (tglAkhir) params.push('tglAkhir=' + encodeURIComponent(tglAkhir));
+        var qs = '?' + params.join('&');
+
+        $.ajax({
+            url: window.API_BASE_URL + '/api/drs' + qs,
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (data) {
+                rawHistoryList = data;
+                historyTable.setData(data);
+            },
+            error: function () {
+                $('#historyBody').html('<tr><td colspan="9" style="text-align:center;padding:2rem;color:#dc2626;">Gagal memuat data riwayat DRS. Pastikan REST API berjalan.</td></tr>');
+            }
+        });
+    }
+
+    $('#btnFilterHistoryDate').on('click', function () {
+        loadHistoryData();
+    });
+    $('#historyTglAwal, #historyTglAkhir').on('change', function () {
+        loadHistoryData();
+    });
+
+    loadHistoryData();
+});
+</script>
+}

@@ -1,0 +1,96 @@
+@{
+    ViewData["Title"] = "Halaman Depan";
+}
+
+<div class="row">
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-users"></i></div>
+            <div>
+                <div id="statUsers" class="stat-number">0</div>
+                <div class="stat-label">Total Pengguna</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fas fa-shield-alt"></i></div>
+            <div>
+                <div id="statRoles" class="stat-number">0</div>
+                <div class="stat-label">Total Role</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-12 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="fas fa-bars"></i></div>
+            <div>
+                <div id="statMenus" class="stat-number">0</div>
+                <div class="stat-label">Total Menu</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-md-12 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-home" style="color:#ea580c;margin-right:.45rem;"></i>Selamat Datang</h3>
+                <span style="font-size:.75rem;color:#94a3b8;">Branch Management Portal</span>
+            </div>
+            <div class="card-body">
+                <p style="color:#64748b;font-size:.9rem;line-height:1.8;">
+                    Selamat datang di portal <strong>Sistem Optimasi Distribusi</strong>.<br>
+                    Anda masuk sebagai <strong>@(User.Identity?.Name ?? "Branch Manager")</strong> dengan hak akses pengelolaan optimasi rute dan distribusi.
+                </p>
+                <div class="dash-actions" style="margin-top:1.5rem;">
+                    <a class="dash-action" href="/Admin/Database">
+                        <i class="fas fa-database"></i>
+                        <span><strong>Database Sistem</strong><small>Kelola pengguna, role & menu</small></span>
+                    </a>
+                    <div class="dash-action" style="cursor:default;">
+                        <i class="fas fa-route"></i>
+                        <span><strong>Optimasi Rute</strong><small>Kalkulasi rute & matriks jarak</small></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-12 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-info-circle" style="color:#ea580c;margin-right:.45rem;"></i>Info Sistem</h3>
+            </div>
+            <div class="card-body">
+                <p style="color:#64748b;font-size:.875rem;line-height:1.7;">
+                    <strong>Aplikasi:</strong> Sistem Optimasi Distribusi<br>
+                    <strong>Pengguna:</strong> @(User.Identity?.Name ?? "Branch Manager")<br>
+                    <strong>Database:</strong> Azure SQL Database (sistem-optimasi)<br>
+                    <strong>Status API:</strong> Terhubung ke Backend REST API
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(function () {
+    // Ambil statistik real-time dari Backend API
+    $.ajax({
+        url: window.API_BASE_URL + '/api/admin/dashboard-stats',
+        type: 'GET',
+        contentType: 'application/json',
+        success: function (data) {
+            $('#statUsers').text(data.totalUsers);
+            $('#statRoles').text(data.totalRoles);
+            $('#statMenus').text(data.totalMenus);
+        },
+        error: function (xhr) {
+            console.error('Gagal mengambil data statistik:', xhr);
+        }
+    });
+});
+</script>
+}

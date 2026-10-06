@@ -1,0 +1,94 @@
+@{
+    ViewData["Title"] = "Halaman Depan";
+}
+
+<div class="row">
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-users"></i></div>
+            <div>
+                <div id="statUsers" class="stat-number">0</div>
+                <div class="stat-label">Total Pengguna</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fas fa-shield-alt"></i></div>
+            <div>
+                <div id="statRoles" class="stat-number">0</div>
+                <div class="stat-label">Total Role</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-12 mb-3">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="fas fa-bars"></i></div>
+            <div>
+                <div id="statMenus" class="stat-number">0</div>
+                <div class="stat-label">Total Menu</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-md-12 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-home" style="color:#ea580c;margin-right:.45rem;"></i>Halaman Depan</h3>
+                <span style="font-size:.72rem;color:#94a3b8;">Akses penuh via API Backend</span>
+            </div>
+            <div class="card-body">
+                <div class="dash-actions">
+                    <a class="dash-action" href="/Home/Index">
+                        <i class="fas fa-home"></i>
+                        <span><strong>Halaman Depan</strong><small>Portal utama</small></span>
+                    </a>
+                    <a class="dash-action" href="/Admin/Database">
+                        <i class="fas fa-database"></i>
+                        <span><strong>Database</strong><small>Kelola data sistem</small></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-12 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-info-circle" style="color:#ea580c;margin-right:.45rem;"></i>Info Sistem</h3>
+            </div>
+            <div class="card-body">
+                <p style="color:#64748b;font-size:.875rem;">
+                    <strong>Frontend:</strong> SystemOptimasi (MVC Razor + jQuery AJAX)<br>
+                    <strong>Backend:</strong> RestApiSistemOptimasi (REST API + Swagger)<br>
+                    <strong>Database:</strong> Azure SQL Database (sistem-optimasi)<br>
+                    <strong>Autentikasi:</strong> Cookie Session + REST API Auth<br>
+                    <strong>Email:</strong> SMTP via MailKit
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(function () {
+    // Request ke Backend API lewat jQuery AJAX
+    $.ajax({
+        url: window.API_BASE_URL + '/api/admin/dashboard-stats',
+        type: 'GET',
+        contentType: 'application/json',
+        success: function (data) {
+            $('#statUsers').text(data.totalUsers);
+            $('#statRoles').text(data.totalRoles);
+            $('#statMenus').text(data.totalMenus);
+        },
+        error: function (xhr) {
+            console.error('Gagal mengambil data statistik dashboard:', xhr);
+        }
+    });
+});
+</script>
+}
+

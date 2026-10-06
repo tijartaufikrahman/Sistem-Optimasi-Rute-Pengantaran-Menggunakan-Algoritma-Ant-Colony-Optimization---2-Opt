@@ -1,0 +1,203 @@
+@{
+    ViewData["Title"] = "Detail Delivery Run Sheet";
+    var drsId = ViewData["DrsId"];
+}
+
+<div id="drsDetailAlertArea"></div>
+
+<!-- Title Card -->
+<div class="row">
+    <div class="col-12 mb-3">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <h2 style="font-size:1.25rem;font-weight:700;color:#1e293b;margin:0;">
+                    <i class="fas fa-file-invoice" style="color:#ea580c;margin-right:6px;"></i> Detail DRS <span id="titleNoDrs" style="color:#ea580c;font-family:monospace;">...</span>
+                </h2>
+            </div>
+            <div>
+                <span id="badgeStatusDrsHeader"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Informasi Induk DRS -->
+    <div class="col-lg-4 col-md-12">
+        <div class="db-data-card" style="margin-bottom:1.5rem;">
+            <div class="db-card-top">
+                <h3 class="db-card-title"><i class="fas fa-info-circle" style="color:#ea580c;margin-right:.45rem;"></i> Informasi DRS</h3>
+            </div>
+            <div style="padding:1.25rem 1.5rem;">
+                <div class="mb-3">
+                    <div style="font-size:.78rem;color:#64748b;text-transform:uppercase;font-weight:600;">Nomor DRS</div>
+                    <div style="font-size:1.1rem;font-weight:700;color:#ea580c;font-family:monospace;" id="infoNoDrs">-</div>
+                </div>
+                <div class="mb-3">
+                    <div style="font-size:.78rem;color:#64748b;text-transform:uppercase;font-weight:600;">Kantor / Hub Distribusi</div>
+                    <div style="font-weight:600;color:#1e293b;" id="infoNamaKantor">-</div>
+                </div>
+                <div class="mb-3">
+                    <div style="font-size:.78rem;color:#64748b;text-transform:uppercase;font-weight:600;">Oranger Penugasan</div>
+                    <div style="font-weight:700;color:#0f172a;display:flex;align-items:center;gap:6px;" id="infoNamaOranger">-</div>
+                </div>
+                <div class="mb-3">
+                    <div style="font-size:.78rem;color:#64748b;text-transform:uppercase;font-weight:600;">Tanggal Tugas</div>
+                    <div style="font-weight:500;color:#334155;" id="infoTanggalTugas">-</div>
+                </div>
+                <div class="mb-3">
+                    <div style="font-size:.78rem;color:#64748b;text-transform:uppercase;font-weight:600;">Status DRS</div>
+                    <div id="infoStatusDrs">-</div>
+                </div>
+                <div class="mb-3">
+                    <div style="font-size:.78rem;color:#64748b;text-transform:uppercase;font-weight:600;">Total Kiriman Terlampir</div>
+                    <div style="font-size:1.1rem;font-weight:700;color:#1e293b;" id="infoTotalKiriman">0 Kiriman</div>
+                </div>
+                <div style="border-top:1px solid #e2e8f0;padding-top:.75rem;font-size:.78rem;color:#94a3b8;" id="infoCreatedAt">
+                    Dibuat pada: -
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabel Daftar Kiriman Terlampir -->
+    <div class="col-lg-8 col-md-12">
+        <div class="db-data-card">
+            <div class="db-card-top">
+                <h3 class="db-card-title"><i class="fas fa-boxes" style="color:#ea580c;margin-right:.45rem;"></i> Daftar Kiriman</h3>
+                <span class="db-badge" style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;" id="countBadge">0 Kiriman</span>
+            </div>
+
+            <div class="db-table-wrap">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th class="db-th-center" style="width:45px;">#</th>
+                            <th>NO. RESI</th>
+                            <th>PENERIMA</th>
+                            <th>ALAMAT TUJUAN</th>
+                            <th>BERAT</th>
+                            <th class="db-th-center">STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="drsKirimanBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center;padding:2.5rem;color:#64748b;">
+                                <i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Memuat data rincian kiriman...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="db-card-footer">
+                <div class="db-info-text" id="footerText">Menampilkan 0 kiriman</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(function () {
+    var drsId = @(drsId ?? 0);
+
+    function showAlert(msg, type) {
+        var cls = type === 'success' ? 'db-alert-success' : 'db-alert-danger';
+        var icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        $('#drsDetailAlertArea').html(
+            '<div class="db-alert ' + cls + '"><i class="fas ' + icon + '"></i> ' + msg + '</div>'
+        );
+        setTimeout(function () {
+            $('#drsDetailAlertArea .db-alert').fadeOut(300, function () { $(this).remove(); });
+        }, 3500);
+    }
+
+    function getBadgeDrs(status) {
+        switch (status) {
+            case 'Assigned':
+                return '<span class="db-badge" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;"><i class="fas fa-user-tag"></i> Assigned</span>';
+            case 'In Progress':
+                return '<span class="db-badge" style="background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;"><i class="fas fa-motorcycle"></i> In Progress</span>';
+            case 'Completed':
+                return '<span class="db-badge" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;"><i class="fas fa-check-circle"></i> Completed</span>';
+            case 'Canceled':
+                return '<span class="db-badge" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;"><i class="fas fa-times-circle"></i> Canceled</span>';
+            default:
+                return '<span class="db-badge">' + (status || '-') + '</span>';
+        }
+    }
+
+    function getBadgeKiriman(status) {
+        switch (status) {
+            case 'Pending':
+            case 'Manifest':
+                return '<span class="db-badge" style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;"><i class="fas fa-clipboard-list"></i> ' + status + '</span>';
+            case 'On Delivery':
+            case 'In Transit':
+                return '<span class="db-badge" style="background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;"><i class="fas fa-shipping-fast"></i> ' + status + '</span>';
+            case 'Delivered':
+                return '<span class="db-badge" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;"><i class="fas fa-check-circle"></i> Delivered</span>';
+            case 'Failed':
+                return '<span class="db-badge" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;"><i class="fas fa-times-circle"></i> Failed</span>';
+            default:
+                return '<span class="db-badge">' + (status || '-') + '</span>';
+        }
+    }
+
+    function loadDetail() {
+        if (!drsId || drsId <= 0) {
+            showAlert('ID DRS tidak valid.', 'danger');
+            return;
+        }
+
+        $.ajax({
+            url: window.API_BASE_URL + '/api/drs/' + drsId,
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (d) {
+                $('#titleNoDrs').text(d.noDRS);
+                $('#badgeStatusDrsHeader').html(getBadgeDrs(d.statusDRS));
+
+                $('#infoNoDrs').text(d.noDRS);
+                $('#infoNamaKantor').text(d.namaKantor);
+                $('#infoNamaOranger').html('<i class="fas fa-user-circle" style="color:#ea580c;"></i> ' + d.namaOranger);
+                $('#infoTanggalTugas').text(d.tanggalTugas);
+                $('#infoStatusDrs').html(getBadgeDrs(d.statusDRS));
+                $('#infoTotalKiriman').text((d.totalKiriman || 0) + ' Kiriman');
+                $('#infoCreatedAt').text('Dibuat pada: ' + (d.createdAt || '-'));
+
+                var list = d.kirimanList || [];
+                $('#countBadge').text(list.length + ' Kiriman');
+                $('#footerText').text('Menampilkan ' + list.length + ' kiriman');
+
+                if (list.length === 0) {
+                    $('#drsKirimanBody').html('<tr><td colspan="6" style="text-align:center;padding:3rem;color:#94a3b8;"><i class="fas fa-box-open" style="font-size:2rem;margin-bottom:.5rem;display:block;"></i>Belum ada data kiriman.</td></tr>');
+                } else {
+                    var html = '';
+                    for (var i = 0; i < list.length; i++) {
+                        var k = list[i];
+                        var telp = k.teleponPenerima ? '<div style="font-size:.78rem;color:#64748b;"><i class="fas fa-phone"></i> ' + k.teleponPenerima + '</div>' : '';
+                        html += '<tr>' +
+                            '<td class="db-td-center">' + (i + 1) + '</td>' +
+                            '<td class="db-td-bold" style="color:#ea580c;font-family:monospace;"><i class="fas fa-barcode"></i> ' + k.nomorKiriman + '</td>' +
+                            '<td><div style="font-weight:600;color:#1e293b;">' + k.namaPenerima + '</div>' + telp + '</td>' +
+                            '<td style="font-size:.82rem;max-width:260px;">' + k.alamatTujuan + '</td>' +
+                            '<td>' + (k.beratKg ? k.beratKg + ' Kg' : '-') + '</td>' +
+                            '<td class="db-td-center">' + getBadgeKiriman(k.statusPengantaran) + '</td>' +
+                        '</tr>';
+                    }
+                    $('#drsKirimanBody').html(html);
+                }
+            },
+            error: function () {
+                showAlert('Gagal memuat detail lembar tugas DRS dari server backend.', 'danger');
+                $('#drsKirimanBody').html('<tr><td colspan="6" style="text-align:center;padding:2rem;color:#dc2626;">Gagal memuat data DRS.</td></tr>');
+            }
+        });
+    }
+
+    loadDetail();
+});
+</script>
+}

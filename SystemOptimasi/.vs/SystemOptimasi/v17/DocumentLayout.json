@@ -1,0 +1,69 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Programing\\Project 6\\SystemOptimasi\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{240608B0-E10A-4F74-BF16-B86402B686D2}|SystemOptimasi\\SystemOptimasi.csproj|c:\\programing\\project 6\\systemoptimasi\\systemoptimasi\\views\\admin\\dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{240608B0-E10A-4F74-BF16-B86402B686D2}|SystemOptimasi\\SystemOptimasi.csproj|solutionrelative:systemoptimasi\\views\\admin\\dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{240608B0-E10A-4F74-BF16-B86402B686D2}|SystemOptimasi\\SystemOptimasi.csproj|c:\\programing\\project 6\\systemoptimasi\\systemoptimasi\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{240608B0-E10A-4F74-BF16-B86402B686D2}|SystemOptimasi\\SystemOptimasi.csproj|solutionrelative:systemoptimasi\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{131369f2-062d-44a2-8671-91ff31efb4f4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:11:0:{2456bd12-ecf7-4988-a4a6-67d49173f565}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Dashboard.cshtml",
+              "DocumentMoniker": "C:\\Programing\\Project 6\\SystemOptimasi\\SystemOptimasi\\Views\\Admin\\Dashboard.cshtml",
+              "RelativeDocumentMoniker": "SystemOptimasi\\Views\\Admin\\Dashboard.cshtml",
+              "ToolTip": "C:\\Programing\\Project 6\\SystemOptimasi\\SystemOptimasi\\Views\\Admin\\Dashboard.cshtml",
+              "RelativeToolTip": "SystemOptimasi\\Views\\Admin\\Dashboard.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-12T19:47:13.773Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Programing\\Project 6\\SystemOptimasi\\SystemOptimasi\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "SystemOptimasi\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Programing\\Project 6\\SystemOptimasi\\SystemOptimasi\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "SystemOptimasi\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACIAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-12T19:46:40.658Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
